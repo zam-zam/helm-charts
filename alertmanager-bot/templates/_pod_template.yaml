@@ -1,0 +1,69 @@
+{{- define "app.podTemplate" -}}
+metadata:
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+  annotations:
+    {{- include "app.annotations" . | nindent 4 }}
+    checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+  name: {{ include "app.fullname" . }}
+spec:
+  securityContext:
+    runAsUser: 2000
+    runAsGroup: 2000
+    fsGroup: 2000
+  volumes:
+  - name: data
+  {{- if .Values.persistence.enabled }}
+    persistentVolumeClaim:
+      claimName: {{ include "app.fullname" . }}
+  {{- else }}
+    emptyDir: {}
+  {{- end }}
+  - name: templates
+    configMap:
+      name: {{ include "app.fullname" . }}
+  containers:
+  - name: alertmanager-bot
+    image: {{ .Values.image.name }}:{{ .Values.image.tag }}
+    imagePullPolicy: IfNotPresent
+    args:
+    - --alertmanager.url={{ .Values.alertmanager.url }}
+    - --log.level={{ .Values.loglevel }}
+    - --store=bolt
+    - --bolt.path=/data/bot.db
+    env:
+    - name: TELEGRAM_ADMIN
+      valueFrom:
+        secretKeyRef:
+          key: admin
+          name: {{ include "app.fullname" . }}
+    - name: TELEGRAM_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: token
+          name: {{ include "app.fullname" . }}
+    {{- range $name, $value := .Values.env }}
+    {{- if not (empty $value) }}
+    - name: {{ $name | quote }}
+      value: {{ $value | quote }}
+    {{- end }}
+    {{- end }}
+    ports:
+    - containerPort: 8080
+      name: http
+    resources:
+      {{- toYaml .Values.resources | trim | nindent 6 }}
+    volumeMounts:
+    - mountPath: /data
+      name: data
+    - mountPath: /templates
+      name: templates
+  {{- if .Values.nodeSelector }}
+  nodeSelector:
+    {{- toYaml .Values.nodeSelector | trim | nindent 4 }}
+  {{- end }}
+  {{- if .Values.tolerations }}
+  tolerations:
+    {{- toYaml .Values.tolerations | trim | nindent 4 }}
+  {{- end }}
+{{- end }}

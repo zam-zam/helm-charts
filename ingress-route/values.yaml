@@ -1,0 +1,30 @@
+ingressRouteMap: {}
+  # connector:
+  #   spec:
+  #     entryPoints:
+  #     - web
+  #     - websecure
+  #     routes:
+  #     - kind: Rule
+  #       match: Host(`connector.my.domain`)
+  #       services:
+  #       - name: connector
+  #         port: 8080
+
+ingressRouteTcpMap: {}
+  # port-16222:
+  #   spec:
+  #     entryPoints:
+  #     - port-16222
+  #     routes:
+  #     - match: HostSNI(`*`)
+  #       services:
+  #       - name: connector
+  #         port: 8080
+
+middlewareMap: {}
+  # strip-prefix:
+  #   spec:
+  #     stripPrefixRegex:
+  #       regex:
+  #       - "/.+"

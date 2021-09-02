@@ -1,0 +1,56 @@
+image:
+  name: metalmatze/alertmanager-bot
+  tag: 0.4.3
+
+telegram:
+  admin: ""
+  token: ""
+
+alertmanager:
+  url: http://localhost:9093
+
+loglevel: info
+
+resources: {}
+
+env: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+template: |-
+  {{ define "telegram.default" }}
+  {{ range $key, $value := .GroupLabels }}
+  <code>{{ $key }}:</code> {{ $value }}
+  {{- end }}
+  {{ $alert :=  (index .Alerts 0) }}
+  - {{ if eq $alert.Status "firing"}}🔥 {{ end }}<b>{{ $alert.Labels.alertname }}</b>
+  <code>{{ $alert.Annotations.message }}</code>
+
+  Sources: |{{ range $index, $alert := .Alerts -}}
+    {{- if $alert.Labels.instance -}}
+      <code>{{ $alert.Labels.instance }}</code>|
+    {{- else if $alert.Labels.pod -}}
+      <code>{{ $alert.Labels.pod }}</code>|
+    {{- end -}}
+  {{- end }}
+  Total: <b>{{ len .Alerts }}</b> alerts
+  {{ end }}
+
+persistence:
+  enabled: false
+  accessMode: ReadWriteOnce
+  # storageClassName: ""
+  storageSize: 1Gi
+  pv:
+    enabled: false
+    # type can be nfs or hostPath
+    type: nfs
+    # nfs type params
+    nfs:
+      server:
+      path:
+    # hostPath type params
+    hostPath:
+      path:

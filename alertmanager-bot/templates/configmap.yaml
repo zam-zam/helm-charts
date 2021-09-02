@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "app.fullname" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+  annotations:
+    {{- include "app.annotations" . | nindent 4 }}
+data:
+  default.tmpl: |
+    {{- .Values.template | nindent 4 }}

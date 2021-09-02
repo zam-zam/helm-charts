@@ -1,0 +1,47 @@
+rbacMap: {}
+  # roles:
+  #   developer:
+  #     rules:
+  #       - apiGroups:
+  #           - ""
+  #           - extensions
+  #           - apps
+  #           - batch
+  #         resources:
+  #           - deployments
+  #           - replicasets
+  #           - statefulsets
+  #           - pods
+  #           - pods/log
+  #           - pods/exec
+  #           - pods/run
+  #           - pods/attach
+  #           - pods/portforward
+  #           - jobs
+  #           - cronjobs
+  #         verbs:
+  #           - get
+  #           - list
+  #           - watch
+  #           - create
+  #           - update
+  #           - patch
+  #           - delete
+  #     subjects:
+  #       - kind: User
+  #         name: username
+  #         apiGroup: rbac.authorization.k8s.io
+  # clusterRoles:
+  #   developer:
+  #     rules:
+  #       - apiGroups:
+  #           - ""
+  #         resources:
+  #           - namespaces
+  #         verbs:
+  #           - get
+  #           - list
+  #     subjects:
+  #       - kind: User
+  #         name: username
+  #         apiGroup: rbac.authorization.k8s.io

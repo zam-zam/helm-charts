@@ -1,0 +1,9 @@
+storageClassMap: {}
+# storageClassMap:
+#   vsphere-csi-wfc:
+#     provisioner: csi.vsphere.vmware.com
+#     parameters:
+#       csi.storage.k8s.io/fstype: ext4
+#       storagepolicyname: K8S-PV
+#     reclaimPolicy: Delete
+#     volumeBindingMode: WaitForFirstConsumer
