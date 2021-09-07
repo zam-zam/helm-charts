@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "controller.fullname" . }}
+  labels:
+    {{- include "controller.labels" . | nindent 4 }}
+    tier: control-plane
+  annotations:
+    scheduler.alpha.kubernetes.io/critical-pod: ""
+    {{- include "controller.annotations" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "controller.labels" . | nindent 6 }}
+  updateStrategy:
+    type: OnDelete
+  template:
+    metadata:
+      name: {{ include "controller.fullname" . }}
+      labels:
+        {{- include "controller.labels" . | nindent 8 }}
+        tier: control-plane
+      annotations:
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- include "controller.annotations" . | nindent 8 }}
+    spec:
+      containers:
+        - name: vsphere-cloud-controller-manager
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          args:
+            - --cloud-provider=vsphere
+            - --v=2
+            - --cloud-config=/etc/cloud/vsphere.conf
+          volumeMounts:
+            - mountPath: /etc/cloud
+              name: vsphere-config-volume
+              readOnly: true
+          {{- if .Values.resources }}
+          resources:
+            {{- toYaml .Values.resources | trim | nindent 12 }}
+          {{- end }}
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | trim | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations:
+        {{- toYaml .Values.tolerations | trim | nindent 8 }}
+      {{- end }}
+      {{- if .Values.securityContext }}
+      securityContext:
+        {{- toYaml .Values.securityContext | trim | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: vsphere-config-volume
+          secret:
+            secretName: {{ include "controller.fullname" . }}
+      serviceAccountName: {{ include "controller.fullname" . }}
+      hostNetwork: true

@@ -1,0 +1,39 @@
+controller:
+  replicas: 1
+  nodeSelector:
+    node-role.kubernetes.io/master: ""
+  tolerations:
+    - operator: "Exists"
+      effect: NoSchedule
+    - operator: "Exists"
+      effect: NoExecute
+  # config: |
+  #   [Global]
+  #   cluster-id = "unique-kubernetes-cluster-id"
+  #   # ca-file = <ca file path> # optional, use with insecure-flag set to false
+
+  #   [VirtualCenter "192.168.1.1"]
+  #   insecure-flag = "true"
+  #   user = "username"
+  #   password = "password"
+  #   port = "443"
+  #   datacenters = "dc01"
+
+
+node:
+  tolerations:
+    - effect: NoExecute
+      operator: Exists
+    - effect: NoSchedule
+      operator: Exists
+
+defaultStorageClass:
+  enabled: false
+  name: vsphere-csi
+  spec:
+    parameters:
+      fstype: ext4
+      storagepolicyname: K8S
+    provisioner: csi.vsphere.vmware.com
+    reclaimPolicy: Delete
+    volumeBindingMode: Immediate

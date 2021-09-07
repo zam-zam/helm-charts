@@ -1,0 +1,12 @@
+apiVersion: storage.k8s.io/v1beta1
+kind: CSIDriver
+metadata:
+  name: csi.vsphere.vmware.com
+  labels:
+    {{- include "common.labels" . | nindent 4 }}
+    {{- include "controller.labels" . | nindent 4 }}
+  annotations:
+    {{- include "common.annotations" . | nindent 4 }}
+spec:
+  attachRequired: true
+  podInfoOnMount: false

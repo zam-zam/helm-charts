@@ -1,0 +1,12 @@
+{{- if .Values.defaultStorageClass.enabled }}
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: {{ .Values.defaultStorageClass.name }}
+  labels:
+    {{- include "common.labels" . | nindent 4 }}
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+    {{- include "common.annotations" . | nindent 4 }}
+{{- toYaml .Values.defaultStorageClass.spec | trim | nindent 0 }}
+{{- end }}

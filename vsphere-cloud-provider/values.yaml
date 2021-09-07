@@ -1,0 +1,45 @@
+## https://github.com/kubernetes/cloud-provider-vsphere/blob/master/docs/book/tutorials/kubernetes-on-vsphere-with-kubeadm.md#check-that-all-nodes-are-tainted
+# Nodes must be tainted before installing cloud-provider
+# kubectl taint node <nodeName> node.cloudprovider.kubernetes.io/uninitialized=true:NoSchedule
+
+config:
+  global:
+    port: 443
+
+# config:
+#   global:
+#     port: 443
+#     insecureFlag: true
+#   vcenter:
+#     dc01: <vcenter>
+#       server: 192.168.1.1
+#       datacenters:
+#         - dc01
+#       user: "username"
+#       password: "password"
+
+image:
+  repository: gcr.io/cloud-provider-vsphere/cpi/release/manager
+  tag: v1.19.0
+
+securityContext:
+  runAsUser: 1001
+
+nodeSelector:
+  node-role.kubernetes.io/master: ""
+
+tolerations:
+  - key: node.cloudprovider.kubernetes.io/uninitialized
+    value: "true"
+    effect: NoSchedule
+  - key: node-role.kubernetes.io/master
+    effect: NoSchedule
+    operator: Exists
+  - key: node.kubernetes.io/not-ready
+    effect: NoSchedule
+    operator: Exists
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
